@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  postgres_authtdd:
+    container_name: postgres_authtdd
+    image: postgres:12
+    volumes:
+      - authtdddata:/var/lib/postgresql/data
+    restart: unless-stopped
+    environment:
+      TZ: America/Fortaleza
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PG_DATA: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+volumes:
+  authtdddata:
