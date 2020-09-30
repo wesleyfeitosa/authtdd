@@ -1,32 +1,29 @@
-import { Repository } from 'typeorm';
-import { classToClass } from 'class-transformer';
-
 import User from '@modules/users/infra/typeorm/entities/User';
 import IRegisterUserDTO from '@modules/users/dtos/IRegisterUserDTO';
-import BCryptHashProvider from '@modules/users/providers/HashProvider/implementations/BCryptHashProvider';
 import AppError from '@shared/errors/AppError';
+import IUsersRepository from '../repositories/IUsersRepository';
+import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
 class RegisterUserService {
-  constructor(private usersRepository: Repository<User>) {}
+  constructor(
+    private usersRepository: IUsersRepository,
+    private hashProvider: IHashProvider,
+  ) {}
 
   public async execute({
     name,
     email,
     password,
   }: IRegisterUserDTO): Promise<User> {
-    const bcryptHashProvider = new BCryptHashProvider();
-
-    const checkUserExists = await this.usersRepository.findOne({
-      where: { email },
-    });
+    const checkUserExists = await this.usersRepository.findByEmail(email);
 
     if (checkUserExists) {
       throw new AppError('User already exists.');
     }
 
-    const hashedPassword = await bcryptHashProvider.generateHash(password);
+    const hashedPassword = await this.hashProvider.generateHash(password);
 
-    const user = this.usersRepository.create({
+    const user = await this.usersRepository.create({
       name,
       email,
       password_hash: hashedPassword,
@@ -34,7 +31,7 @@ class RegisterUserService {
 
     await this.usersRepository.save(user);
 
-    return classToClass(user);
+    return user;
   }
 }
 

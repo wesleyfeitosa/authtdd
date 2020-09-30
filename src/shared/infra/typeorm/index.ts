@@ -1,3 +1,6 @@
-import { createConnections } from 'typeorm';
+import { createConnection } from 'typeorm';
 
-createConnections();
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+module.exports = async () => {
+  await createConnection();
+};
