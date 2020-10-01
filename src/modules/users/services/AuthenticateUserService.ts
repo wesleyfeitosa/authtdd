@@ -1,4 +1,5 @@
 import { sign } from 'jsonwebtoken';
+import { injectable, inject } from 'tsyringe';
 
 import IAuthenticateUserDTO from '@modules/users/dtos/IAuthenticateUserDTO';
 import User from '@modules/users/infra/typeorm/entities/User';
@@ -12,9 +13,13 @@ interface IResponse {
   token: string;
 }
 
+@injectable()
 class AuthenticateUserService {
   constructor(
+    @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+
+    @inject('HashProvider')
     private hashProvider: IHashProvider,
   ) {}
 

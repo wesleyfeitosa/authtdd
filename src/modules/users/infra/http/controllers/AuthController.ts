@@ -1,29 +1,22 @@
 import { Request, Response } from 'express';
 import { classToClass } from 'class-transformer';
+import { container } from 'tsyringe';
 
 import IRegisterUserDTO from '@modules/users/dtos/IRegisterUserDTO';
 import IAuthenticateUserDTO from '@modules/users/dtos/IAuthenticateUserDTO';
 import RegisterUserService from '@modules/users/services/RegisterUserService';
 import AuthenticateUserService from '@modules/users/services/AuthenticateUserService';
-import BCryptHashProvider from '../../../providers/HashProvider/implementations/BCryptHashProvider';
-import UsersRepository from '../../typeorm/repositories/UsersRepository';
 
 class AuthController {
   public async register(
     request: Request,
     response: Response,
   ): Promise<Response> {
-    const usersRepository = new UsersRepository();
-    const bcryptHashProvider = new BCryptHashProvider();
-
-    const registerUserService = new RegisterUserService(
-      usersRepository,
-      bcryptHashProvider,
-    );
-
     const { name, email, password }: IRegisterUserDTO = request.body;
 
-    const user = await registerUserService.execute({
+    const registerUser = container.resolve(RegisterUserService);
+
+    const user = await registerUser.execute({
       name,
       email,
       password,
@@ -33,17 +26,11 @@ class AuthController {
   }
 
   public async login(request: Request, response: Response): Promise<Response> {
-    const usersRepository = new UsersRepository();
-    const bcryptHashProvider = new BCryptHashProvider();
-
-    const authenticateUserService = new AuthenticateUserService(
-      usersRepository,
-      bcryptHashProvider,
-    );
-
     const { email, password }: IAuthenticateUserDTO = request.body;
 
-    const { user, token } = await authenticateUserService.execute({
+    const authenticateUser = container.resolve(AuthenticateUserService);
+
+    const { user, token } = await authenticateUser.execute({
       email,
       password,
     });

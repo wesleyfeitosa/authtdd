@@ -1,12 +1,18 @@
+import { injectable, inject } from 'tsyringe';
+
 import User from '@modules/users/infra/typeorm/entities/User';
 import IRegisterUserDTO from '@modules/users/dtos/IRegisterUserDTO';
 import AppError from '@shared/errors/AppError';
 import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
+@injectable()
 class RegisterUserService {
   constructor(
+    @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+
+    @inject('HashProvider')
     private hashProvider: IHashProvider,
   ) {}
 

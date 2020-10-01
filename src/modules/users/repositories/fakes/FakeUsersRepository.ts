@@ -7,6 +7,10 @@ import ICreateUserDTO from '../../dtos/ICreateUserDTO';
 class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
 
+  public async find(): Promise<User[]> {
+    return this.users;
+  }
+
   public async findByEmail(email: string): Promise<User | undefined> {
     const findUser = this.users.find(user => user.email === email);
 
